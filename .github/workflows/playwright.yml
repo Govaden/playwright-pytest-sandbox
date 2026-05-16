@@ -26,7 +26,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Install Playwright browsers
-        run: playwright install --with-deps
+        run: python -m playwright install --with-deps
+
+      - name: Check Playwright install
+        run: python -m playwright --version
 
       - name: Create report directories
         run: mkdir -p reports/html
