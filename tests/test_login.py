@@ -5,6 +5,7 @@ def launch_browser(p):
     return p.chromium.launch(
         headless=True,
         slow_mo=1000,
+        args=["--no-sandbox", "--disable-setuid-sandbox"]
     )
 
 def test_page(page):
