@@ -23,7 +23,7 @@ def test_page():
 
         login_credentials = page.locator(".login_credentials")
 
-        expect(login_credentials).to_have_value("standard_user")
+        expect(login_credentials).to_contain_text("standard_user")
         expect(login_credentials).to_contain_text("locked_out_user")
         expect(login_credentials).to_contain_text("problem_user")
         expect(login_credentials).to_contain_text("performance_glitch_user")
