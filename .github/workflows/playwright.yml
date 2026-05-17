@@ -2,42 +2,45 @@ name: Playwright Tests
 
 on:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
   test:
-    timeout-minutes: 30
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install system dependencies + Playwright
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          python -m playwright install --with-deps
 
-      - name: Check Playwright install
-        run: python -m playwright --version
+      - name: Install Playwright browsers
+        run: python -m playwright install --with-deps
 
-      - name: Create report directories
-        run: mkdir -p reports/html
+      - name: Create report folder
+        run: mkdir -p reports
 
       - name: Run tests
-        run: pytest --tracing=retain-on-failure
+        run: pytest
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v4
         if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: pytest-report
-          path: reports/html/report.html
+          path: reports/report.html
+
+      - name: Upload traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: test-results/
