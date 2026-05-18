@@ -36,7 +36,7 @@ def test_negative_login(page: Page):
         "Epic sadface: Username and password do not match any user in this service")
     expect(error_message).to_be_visible()
 
-    page.screenshot(path="test_results/test_login/screenshot_negative_login.png")
+    page.screenshot(path="test_results/test_auth/screenshot_negative_login.png")
 
 def test_positive_login(page: Page):
     page.goto("https://www.saucedemo.com/")
@@ -70,4 +70,42 @@ def test_positive_login(page: Page):
     sort_dropdown.select_option("za")  # Sort Z → A
     expect(sort_dropdown).to_have_value("za")
 
-    page.screenshot(path="test_results/test_login/screenshot_positive_login.png")
+    page.screenshot(path="test_results/test_auth/screenshot_positive_login.png")
+
+def test_logout(page: Page):
+    page.goto("https://www.saucedemo.com/")
+
+    username_input = page.locator("#user-name")
+    username_input.fill("standard_user")
+    expect(username_input).to_have_value("standard_user")
+
+    password_input = page.locator("#password")
+    password_input.fill("secret_sauce")
+    expect(password_input).to_have_value("secret_sauce")
+
+    login_button = page.get_by_role("button", name="Login")
+    login_button.click()
+
+    expect(page).to_have_url("https://www.saucedemo.com/inventory.html")
+    expect(page.locator(".inventory_list")).to_be_visible()
+
+    menu_button = page.get_by_role("button", name="Open Menu")
+    menu_button.click()
+
+    expect(page.locator(".bm-menu-wrap")).to_have_attribute("aria-hidden", "false")
+    
+    expect(page.locator("#logout_sidebar_link")).to_be_visible()
+
+    logout_link = page.get_by_role("link", name="Logout")
+    expect(logout_link).to_be_visible()
+
+    logout_link.hover()
+    logout_link.press("Enter")
+
+    expect(page).to_have_url("https://www.saucedemo.com/")
+
+    expect(page.get_by_placeholder("Username")).to_be_visible()
+    expect(page.get_by_placeholder("Password")).to_be_visible()
+    expect(page.get_by_role("button", name="Login")).to_be_visible()
+
+    page.screenshot(path="test_results/test_auth/screenshot_logout.png")
