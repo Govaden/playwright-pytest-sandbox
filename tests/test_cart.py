@@ -14,21 +14,35 @@ def test_cart(page: Page):
     expect(page).to_have_url("https://www.saucedemo.com/inventory.html")
     expect(page.locator(".inventory_list")).to_be_visible()
 
-    product = page.locator(".inventory_item").filter(
-        has_text="Sauce Labs Backpack"
-    )
+    products_to_add = [
+        "Sauce Labs Backpack",
+        "Sauce Labs Bike Light",
+        "Sauce Labs Bolt T-Shirt"
+    ]
 
-    expect(product).to_be_visible()
-    product.get_by_role("button", name="Add to cart").click()
+    for product_name in products_to_add:
+        page.locator(".inventory_item").filter(
+            has_text=product_name
+        ).get_by_role("button", name="Add to cart").click()
 
-    cart_badge = page.locator(".shopping_cart_badge")
-    expect(cart_badge).to_have_text("1")
+    expect(page.locator(".shopping_cart_badge")).to_have_text("3")
 
     page.locator(".shopping_cart_link").click()
     expect(page).to_have_url("https://www.saucedemo.com/cart.html")
 
-    expect(page.get_by_text("Sauce Labs Backpack")).to_be_visible()
+    for product_name in products_to_add:
+        expect(page.get_by_text(product_name)).to_be_visible()
 
-    page.get_by_role("button", name="Remove").click()
-    
-    expect(page.get_by_text("Sauce Labs Backpack")).not_to_be_visible()
+    product_to_remove = "Sauce Labs Bike Light"
+
+    page.locator(".cart_item").filter(
+        has_text=product_to_remove
+    ).get_by_role("button", name="Remove").click()
+
+    expect(page.get_by_text(product_to_remove)).not_to_be_visible()
+    expect(page.locator(".shopping_cart_badge")).to_have_text("2")
+    remaining = [p for p in products_to_add if p != product_to_remove]
+    for product_name in remaining:
+        expect(page.get_by_text(product_name)).to_be_visible()
+
+    page.screenshot(path="test_results/test_cart/screenshot_cart_remove.png")
