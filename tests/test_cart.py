@@ -1,4 +1,5 @@
 from playwright.sync_api import Page, expect
+from pytest_playwright.pytest_playwright import page
 
 def test_cart(page: Page):
     page.goto("https://www.saucedemo.com/")
@@ -30,8 +31,7 @@ def test_cart(page: Page):
     page.locator(".shopping_cart_link").click()
     expect(page).to_have_url("https://www.saucedemo.com/cart.html")
 
-    for product_name in products_to_add:
-        expect(page.get_by_text(product_name)).to_be_visible()
+    expect(page.locator(".inventory_item_name", has_text=product_name)).to_be_visible()
 
     product_to_remove = "Sauce Labs Bike Light"
 
@@ -39,10 +39,11 @@ def test_cart(page: Page):
         has_text=product_to_remove
     ).get_by_role("button", name="Remove").click()
 
-    expect(page.get_by_text(product_to_remove)).not_to_be_visible()
+    expect(page.locator(".inventory_item_name", has_text=product_to_remove)).not_to_be_visible()
     expect(page.locator(".shopping_cart_badge")).to_have_text("2")
+    
     remaining = [p for p in products_to_add if p != product_to_remove]
     for product_name in remaining:
-        expect(page.get_by_text(product_name)).to_be_visible()
+        expect(page.locator(".inventory_item_name", has_text=product_name)).to_be_visible()
 
     page.screenshot(path="test_results/test_cart/screenshot_cart_remove.png")
