@@ -1,9 +1,28 @@
 import re
 from playwright.sync_api import Page, expect
+import pytest
 
-def test_negative_login(page: Page):
+@pytest.mark.parametrize("username, password, expected_error", [
+    ("",              "",             "Epic sadface: Username is required"),
+    ("test_user",     "",             "Epic sadface: Password is required"),
+    ("standard_user", "12345",        "Epic sadface: Username and password do not match any user in this service"),
+    ("locked_out_user", "secret_sauce", "Epic sadface: Sorry, this user has been locked out."),
+])
+
+def test_negative_login(page: Page, username, password, expected_error):
 
     page.goto("https://www.saucedemo.com/")
+
+    if username:
+        page.locator("#user-name").fill(username)
+    if password:
+        page.locator("#password").fill(password)
+
+    login_button = page.get_by_role("button", name="Login")
+    login_button.click()
+
+    expect(page.get_by_text(expected_error)).to_be_visible()
+    expect(page.locator("xpath=//h3[@data-test='error']")).to_be_visible()
 
     expect(page.get_by_placeholder("Username")).to_be_visible()
     expect(page.get_by_placeholder("Password")).to_be_visible()
@@ -11,43 +30,28 @@ def test_negative_login(page: Page):
     expect(page.get_by_role("heading", name="Accepted usernames are:")).to_be_visible()
     expect(page.get_by_role("heading", name="Password for all users:")).to_be_visible()
     
-    login_button = page.get_by_role("button", name="Login")
     expect(login_button).to_be_visible()
-
-    username_input = page.locator("#user-name")
-    password_input = page.locator("#password")
-
-    username_input.press("Enter")
-    expect(page.get_by_text("Epic sadface: Username is required")).to_be_visible()
-
-    username_input.fill("test_user")
-    username_input.press("Tab")
-    login_button.click()
-    expect(page.get_by_text("Epic sadface: Password is required")).to_be_visible()
-
-    # XPath locator
-    expect(page.locator("xpath=//h3[@data-test='error']")).to_be_visible()
-
-    username_input.fill("standard_user")
-    password_input.fill("12345")
-    login_button.click()
-
-    error_message = page.get_by_text(
-        "Epic sadface: Username and password do not match any user in this service")
-    expect(error_message).to_be_visible()
-
+    
     page.screenshot(path="test_results/test_auth/screenshot_negative_login.png")
 
-def test_positive_login(page: Page):
+@pytest.mark.parametrize("username, password", [
+    ("standard_user",  "secret_sauce"),
+    ("visual_user", "secret_sauce"),
+    ("performance_glitch_user", "secret_sauce"),
+    pytest.param("error_user", "secret_sauce", marks=pytest.mark.xfail(reason="problem_user: wrong product opens, sort broken")),
+    pytest.param("problem_user",   "secret_sauce", marks=pytest.mark.xfail(reason="problem_user: sort dropdown broken")),
+])
+
+def test_positive_login(page: Page, username, password):
     page.goto("https://www.saucedemo.com/")
 
     username_input = page.locator("#user-name")
-    username_input.fill("standard_user")
-    expect(username_input).to_have_value("standard_user")
+    username_input.fill(username)
+    expect(username_input).to_have_value(username)
 
     password_input = page.locator("#password")
-    password_input.fill("secret_sauce")
-    expect(password_input).to_have_value("secret_sauce")
+    password_input.fill(password)
+    expect(password_input).to_have_value(password)
 
     login_button = page.get_by_role("button", name="Login")
     login_button.hover()
@@ -72,16 +76,24 @@ def test_positive_login(page: Page):
 
     page.screenshot(path="test_results/test_auth/screenshot_positive_login.png")
 
-def test_logout(page: Page):
+@pytest.mark.parametrize("username, password", [
+    ("standard_user",  "secret_sauce"),
+    ("problem_user",   "secret_sauce"),
+    ("performance_glitch_user", "secret_sauce"),
+    ("error_user", "secret_sauce"),
+    ("visual_user", "secret_sauce"),
+])
+
+def test_logout(page: Page, username, password):
     page.goto("https://www.saucedemo.com/")
 
     username_input = page.locator("#user-name")
-    username_input.fill("standard_user")
-    expect(username_input).to_have_value("standard_user")
+    username_input.fill(username)
+    expect(username_input).to_have_value(username)
 
     password_input = page.locator("#password")
-    password_input.fill("secret_sauce")
-    expect(password_input).to_have_value("secret_sauce")
+    password_input.fill(password)
+    expect(password_input).to_have_value(password)
 
     login_button = page.get_by_role("button", name="Login")
     login_button.click()
