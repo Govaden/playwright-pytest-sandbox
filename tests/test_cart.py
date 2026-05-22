@@ -1,7 +1,23 @@
 from playwright.sync_api import Page, expect
+import pytest
 from pytest_playwright.pytest_playwright import page
 
-def test_cart(page: Page):
+@pytest.mark.parametrize("products_to_add, product_to_remove", [
+    (
+        ["Sauce Labs Backpack", "Sauce Labs Bike Light", "Sauce Labs Bolt T-Shirt"],
+        "Sauce Labs Bike Light"
+      ),
+    (
+        ["Sauce Labs Fleece Jacket", "Sauce Labs Onesie"],
+        "Sauce Labs Onesie"
+      ),
+    (
+        ["Sauce Labs Backpack", "Sauce Labs Fleece Jacket"],
+        "Sauce Labs Backpack"
+      )
+])
+
+def test_cart(page: Page, products_to_add, product_to_remove):
     page.goto("https://www.saucedemo.com/")
 
     username_input = page.locator("#user-name")

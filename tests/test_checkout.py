@@ -1,6 +1,13 @@
 from playwright.sync_api import Page, expect
+import pytest
 
-def test_checkout(page: Page):
+@pytest.mark.parametrize("first_name, last_name, postal_code", [
+    ("John", "Doe", "12345"),
+    ("Jane", "Smith", "54321"),
+    pytest.param("", "Doe", "12345", marks=pytest.mark.xfail(reason="First name is required")),
+]) 
+
+def test_checkout(page: Page, first_name: str, last_name: str, postal_code: str):
     page.goto("https://www.saucedemo.com/")
 
     username_input = page.locator("#user-name")
@@ -36,13 +43,13 @@ def test_checkout(page: Page):
     last_name_input = page.locator("#last-name")
     postal_code_input = page.locator("#postal-code")
 
-    first_name_input.fill("John")
-    last_name_input.fill("Doe")
-    postal_code_input.fill("12345")
+    first_name_input.fill(first_name)
+    last_name_input.fill(last_name)
+    postal_code_input.fill(postal_code)
 
-    expect(first_name_input).to_have_value("John")
-    expect(last_name_input).to_have_value("Doe")
-    expect(postal_code_input).to_have_value("12345")
+    expect(first_name_input).to_have_value(first_name)
+    expect(last_name_input).to_have_value(last_name)
+    expect(postal_code_input).to_have_value(postal_code)
 
     page.get_by_role("button", name="Continue").click()
 
