@@ -1,6 +1,7 @@
 import re
 from playwright.sync_api import Page, expect
 import pytest
+from page.login_page import LoginPage
 
 @pytest.mark.parametrize("username, password, expected_error", [
     ("",              "",             "Epic sadface: Username is required"),
@@ -13,10 +14,8 @@ def test_negative_login(page: Page, username, password, expected_error):
 
     page.goto("https://www.saucedemo.com/")
 
-    if username:
-        page.locator("#user-name").fill(username)
-    if password:
-        page.locator("#password").fill(password)
+    login_page = LoginPage(page)
+    login_page.login(username, password)
 
     login_button = page.get_by_role("button", name="Login")
     login_button.click()
@@ -38,7 +37,7 @@ def test_negative_login(page: Page, username, password, expected_error):
     ("standard_user",  "secret_sauce"),
     ("visual_user", "secret_sauce"),
     ("performance_glitch_user", "secret_sauce"),
-    pytest.param("error_user", "secret_sauce", marks=pytest.mark.xfail(reason="problem_user: wrong product opens, sort broken")),
+    pytest.param("error_user", "secret_sauce", marks=pytest.mark.xfail(reason="error_user: wrong product opens, sort broken")),
     pytest.param("problem_user",   "secret_sauce", marks=pytest.mark.xfail(reason="problem_user: sort dropdown broken")),
 ])
 
