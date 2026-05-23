@@ -1,4 +1,4 @@
-from playwright.async_api import Locator, Page
+from playwright.sync_api import Locator, Page
 
 class InventoryPage:
 
@@ -39,7 +39,7 @@ class InventoryPage:
     
     @property
     def item_details_name(self) -> Locator:
-        return self.page.get_by_role("heading", name="Item Name")
+        return self.page.locator(".inventory_details_name")
 
     # Actions
 
@@ -51,7 +51,7 @@ class InventoryPage:
         self.get_product_item(product_name).get_by_role("button", name="Add to cart").click()
 
     def open_product(self, product_name: str) -> None:
-        self.get_product_item(product_name).locator("[data-test$='title-link']").click()
+        self.page.locator(".inventory_item_name", has_text=product_name).click()
 
     def sort_products(self, sort_value: str) -> None:
         """Select a sorting option by its value attribute."""
