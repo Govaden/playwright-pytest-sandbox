@@ -1,7 +1,7 @@
 import re
 from playwright.sync_api import Page, expect
 import pytest
-from page.login_page import LoginPage
+from pages.login_page import LoginPage
 
 @pytest.mark.parametrize("username, password, expected_error", [
     ("",              "",             "Epic sadface: Username is required"),
