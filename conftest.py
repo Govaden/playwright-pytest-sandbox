@@ -18,10 +18,6 @@ def browser_context_args(browser_context_args):
     }
 
 @pytest.fixture()
-def login_page(page: Page):
-    return LoginPage(page)
-
-@pytest.fixture()
 def logged_in_page(page: Page):
     login = LoginPage(page)
     login.open()
