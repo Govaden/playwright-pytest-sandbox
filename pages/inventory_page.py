@@ -40,6 +40,10 @@ class InventoryPage:
     @property
     def item_details_name(self) -> Locator:
         return self.page.locator(".inventory_details_name")
+    
+    @property
+    def cart_link(self) -> Locator:
+        return self.page.locator(".shopping_cart_link")
 
     # Actions
 
@@ -49,6 +53,9 @@ class InventoryPage:
 
     def add_product_to_cart(self, product_name: str) -> None:
         self.get_product_item(product_name).get_by_role("button", name="Add to cart").click()
+
+    def open_cart(self) -> None:
+        self.cart_link.click()
 
     def open_product(self, product_name: str) -> None:
         self.page.locator(".inventory_item_name", has_text=product_name).click()
@@ -61,5 +68,6 @@ class InventoryPage:
         self.menu_button.click()
 
     def logout(self) -> None:
+        """Click the Logout link in the sidebar menu. Assumes the menu is already open."""
         self.logout_link.hover()
         self.logout_link.press("Enter")
