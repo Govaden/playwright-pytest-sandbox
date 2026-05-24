@@ -48,7 +48,7 @@ def test_checkout(page: Page, first_name: str, last_name: str, postal_code: str)
     expect(checkout.get_overview_item("Sauce Labs Backpack")).to_be_visible()
     expect(checkout.summary_total).to_be_visible()
 
-    checkout.finish_button.click()
+    checkout.finish_checkout()
     expect(page).to_have_url(CheckoutPage.URL_COMPLETE)
     expect(checkout.confirmation_message).to_be_visible()
 

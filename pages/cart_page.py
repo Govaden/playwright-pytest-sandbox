@@ -13,10 +13,6 @@ class CartPage:
     def cart_badge(self) -> Locator:
         return self.page.locator(".shopping_cart_badge")
     
-    @property
-    def checkout_button(self) -> Locator:
-        return self.page.get_by_role("button", name="Checkout")
-    
     # Actions
 
     def get_product_item(self, product_name: str) -> Locator:
