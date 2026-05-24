@@ -28,6 +28,3 @@ class CartPage:
         self.page.locator(".cart_item").filter(
             has_text=product_name
         ).get_by_role("button", name="Remove").click()
-
-    def go_to_checkout(self) -> None:
-        self.checkout_button.click()
