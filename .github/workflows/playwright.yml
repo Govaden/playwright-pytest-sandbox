@@ -12,12 +12,14 @@ on:
   
 
 jobs:
-  test:
+  playwright-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      - name: Install CI packages
+        run: npm ci
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -48,3 +50,19 @@ jobs:
         with:
           name: playwright-traces
           path: reports/artifacts/
+          
+      - name: Upload JUnit results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-results
+          path: reports/junit/results.xml
+
+      - name: Test report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Test Results
+          path: reports/junit/results.xml
+          reporter: java-junit
+
