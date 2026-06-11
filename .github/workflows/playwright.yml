@@ -17,9 +17,6 @@ jobs:
     timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v5
-      - name: Install CI packages
-        run: npm ci
 
       - name: Setup Python
         uses: actions/setup-python@v5
